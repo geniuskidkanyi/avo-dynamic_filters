@@ -1,0 +1,36 @@
+<%
+  if filter.value.present? && filter.value.include?(" to ")
+    value = filter.value.split " to "
+  else
+    value = filter.value
+  end
+%>
+<%= render Avo::DynamicFilters::FilterComponent.new filter: filter, render_open: render_open,
+  dropdown_data: {
+    controller: "avo-filter date-filter",
+    date_filter_picker_options_value: {
+      defaultDate: value,
+      enableTime: filter&.field&.type.in?(%w[time date_time]),
+      noCalendar: filter&.field&.type == "time",
+    },
+  } do |c| %>
+  <% c.with_conditions do %>
+    <%= select_tag :condition,
+      options_for_select(filter.conditions, filter.condition),
+      id: :condition_selector,
+      class: "text-sm rounded py-1 w-full",
+      data: {
+        control: :condition,
+        action: 'input->date-filter#onConditionChange input->avo-filter#onConditionChange',
+      } %>
+  <% end %>
+  <% c.with_value do %>
+    <%= text_field_tag :value, "",
+      class: "text-sm rounded py-1 w-full",
+      data: {
+        date_filter_target: "input",
+        control: "value",
+        action: "click->date-filter#closePicker"
+      } %>
+  <% end %>
+<% end %>

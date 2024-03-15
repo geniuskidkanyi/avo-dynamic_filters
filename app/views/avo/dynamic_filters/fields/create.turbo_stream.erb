@@ -1,0 +1,7 @@
+<turbo-stream action="prepend" target="<%= params[:turbo_frame] %>">
+  <template>
+    <%= render partial: @filter.partial, locals: {filter: @filter, render_open: true} %>
+  </template>
+</turbo-stream>
+
+<turbo-stream action="close_filters_dropdown"></turbo-stream>

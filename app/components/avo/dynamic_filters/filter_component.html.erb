@@ -1,0 +1,77 @@
+<%= content_tag :div,
+  class: "relative flex rounded-full border border-dashed px-2 py-1 items-center hover:bg-gray-25 transition-all shrink-0",
+  data: {
+    component: self.class.to_s.underscore,
+    controller: "avo-filter self-destroy toggle input-autofocus",
+    toggle_exemption_container_value: ".flatpickr-calendar",
+    avo_filters_target: "filter",
+    field_id: filter.field_id,
+    field_type: filter.type,
+    filter_id: filter.unique_id,
+  } do %>
+  <div
+    class="pill flex items-center text-xs font-semibold text-gray-600 cursor-pointer"
+    tabindex="0"
+    data-action="click->toggle#togglePanel click->input-autofocus#focus keydown.enter->input-autofocus#focus keydown.enter->toggle#togglePanel keydown.down->toggle#togglePanel"
+    data-input-autofocus-selector-param="[data-control='value']"
+  >
+    <%= svg filter.class.icon, class: "h-3 inline mr-1 text-white hidden" %> <button data-action="avo-filters#removeFilter"><%= svg "heroicons/mini/x-circle", class: "h-4 p-px mr-1 text-gray-500 hover:text-gray-700" %></button> <%= svg filter.class.icon, class: "mr-1 h-4" %> <%= field.name %>
+    <% if filter.value %>
+      <div class="flex items-center ml-1 text-xs">
+        <span class="border-l pl-1 text-primary-400">
+          <%= sanitize(pill_value.present? ? pill_value : "&nbsp;") %>
+        </span>
+        <%= svg "heroicons/mini/chevron-down", class: "h-3 ml-1" %>
+      </div>
+    <% end %>
+  </div>
+  <% if render_open %>
+    <turbo-stream action="open_filter" unique-id="<%= filter.unique_id %>"></turbo-stream>
+  <% end %>
+  <%= content_tag :div, class: "flex hidden absolute inset-auto top-full mt-3 left-0 p-3 border border-gray-150 bg-white rounded shadow-pill z-30", data: dropdown_data do %>
+    <div class="absolute inset-0 triangle-up pointer-events-none">
+      <%= svg "triangle-up", class: "text-white -translate-y-full ml-6" %>
+    </div>
+    <div class="flex flex-col w-52 text-sm space-y-2">
+      <label for="<%= filter.unique_id %>" class="font-semibold text-xs text-gray-700">Filter by <%= field.name %></label>
+      <% if conditions? %>
+        <%= conditions %>
+      <% else %>
+        <%= select_tag :condition,
+          options_for_select(filter.conditions, filter.condition),
+          id: :condition_selector,
+          class: "text-sm rounded py-1 w-full",
+          data: {
+            control: :condition,
+            action: 'input->avo-filter#onConditionChange',
+          } %>
+      <% end %>
+      <% if value? %>
+        <%= value %>
+      <% else %>
+        <div>
+          <% if filter.instance_of?(Avo::DynamicFilters::SelectFilter) %>
+            <%= select_tag filter.unique_id,
+              options_for_select(field.options_for_filter, filter.value),
+              class: "text-sm rounded py-1 w-full",
+              data: {
+                control: :value,
+                action: "keydown.enter->avo-filters#apply"
+              } %>
+          <% else %>
+            <%= text_field_tag filter.unique_id, filter.value,
+              class: "text-sm rounded py-1 w-full",
+              data: {
+                control: :value,
+                controller: "input-autofocus",
+                action: "keydown.enter->avo-filters#apply"
+              } %>
+          <% end %>
+        </div>
+      <% end %>
+      <%= a_button size: :xs, style: :outline, color: :primary, data: {action: "click->avo-filters#apply"} do %>
+        Apply
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

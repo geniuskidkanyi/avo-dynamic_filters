@@ -1,0 +1,55 @@
+<%= content_tag :div, class: "relative flex w-full px-4 main-filters-panel #{"hidden" unless params[Avo::DynamicFilters.configuration.param_key].present? || Avo::DynamicFilters.configuration.always_expanded}",
+  id: @dynamic_filters_component_id,
+  data: {
+    component: self.class.to_s.underscore,
+    controller: "avo-filters toggle",
+    avo_filters_target: "container",
+    avo_filters_turbo_frame_value: turbo_frame,
+    transition_enter: "transition ease-out duration-100",
+    transition_enter_start: "transform opacity-0 -translate-y-1",
+    transition_enter_end: "transform opacity-100 translate-y-0",
+    transition_leave: "transition ease-in duration-75",
+    transition_leave_start: "transform opacity-100 translate-y-0",
+    transition_leave_end: "transform opacity-0 -translate-y-1",
+  } do %>
+  <div class="relative">
+    <%= a_button icon: :plus,
+      size: :xs,
+      data: {
+        action: "click->toggle#togglePanel",
+        avo_filters_target: "add-filter-button"
+      } do %>
+      Add filter
+    <% end %>
+    <div
+      class="filters-dropdown-selector absolute z-30 inset-auto top-full w-64 left-0 mt-2 p-2 bg-white rounded border border-gray-200 shadow-pill flex flex-col hidden"
+      data-toggle-target="panel"
+    >
+      <div class="absolute inset-0 triangle-up pointer-events-none">
+        <%= svg "triangle-up", class: "text-white -translate-y-full ml-6" %>
+      </div>
+      <% resource.get_filterable_fields.sort_by { |field| field.name }.each do |field| %>
+        <% filter = Avo::DynamicFilters::Filter.filter_for_field_type field.type %>
+        <%= link_to Avo::DynamicFilters::Engine.routes.url_helpers.fields_path(resource_class: resource.class, field_id: field.id, type: field.type, turbo_frame: turbo_frame_id),
+          class: "flex cursor-pointer hover:bg-primary-100 rounded p-1 items-center text-sm font-semibold",
+          data: {
+            turbo_method: :post,
+          } do %>
+          <%= helpers.svg filter.icon, class: "h-4 mr-2 text-primary-400" %> <%= field.name %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <%= turbo_frame_tag turbo_frame_id, class: "flex gap-2 px-2 flex-auto flex-wrap" do %>
+    <% parsed_filters.each do |filter| %>
+      <%= render partial: filter.partial, locals: {filter: filter, render_open: false} %>
+    <% end %>
+  <% end %>
+
+  <div class="justify-self-end">
+    <%= a_button size: :xs, type: :button, style: :text, data: {action: "click->avo-filters#resetFilters"} do %>
+      Reset filters
+    <% end %>
+  </div>
+<% end %>

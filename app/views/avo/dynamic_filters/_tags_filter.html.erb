@@ -1,0 +1,17 @@
+<%= render Avo::DynamicFilters::FilterComponent.new filter: filter, render_open: render_open do |c| %>
+  <%= c.with_value do %>
+    <%= content_tag :div, data: {
+      controller: "tags-filter",
+      tags_filter_whitelist_items_value: filter.suggestions,
+    } do
+      text_field_tag filter.unique_id, filter.value,
+        class: "text-sm rounded py-1 w-full",
+        data: {
+          tags_filter_target: "input",
+          control: :value,
+          action: "keydown.enter->avo-filters#apply",
+          controller: "input-autofocus"
+        }
+      end %>
+  <% end %>
+<% end %>
