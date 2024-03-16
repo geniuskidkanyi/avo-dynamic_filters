@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.files -= Dir["{app/javascript}/**/*"]
 
   spec.add_dependency "zeitwerk", ">= 2.6.12"
-  spec.add_dependency "avo", ">= #{Avo::VERSION}"
+  spec.add_dependency "avo", ">= 3.5.1"
   spec.add_dependency "view_component", ">= 3.7.0"
   spec.add_dependency "ransack", ">= 4.1.1"
 end
