@@ -1,5 +1,5 @@
 require_relative "lib/avo/dynamic_filters/version"
-require_relative "../avo/lib/avo/version"
+#require_relative "../avo/lib/avo/version"
 
 Gem::Specification.new do |spec|
   spec.name = "avo-dynamic_filters"
